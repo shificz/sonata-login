@@ -1,0 +1,79 @@
+framework:
+    test: true
+    secret: secret
+    mailer:
+        enabled: true
+        dsn: null://null
+    form:
+        enabled: true
+    translator:
+        enabled: true
+    router:
+        utf8: true
+    http_method_override: false
+    session:
+        storage_factory_id: session.storage.factory.mock_file
+    assets:
+
+security:
+    role_hierarchy: null
+
+    access_decision_manager:
+        strategy: unanimous
+
+    access_control:
+        - {path: ^/admin/dashboard$, role: ROLE_USER}
+
+    providers:
+        sonata_user_bundle:
+            id: sonata.user.security.user_provider
+
+    firewalls:
+        main:
+            lazy: true
+            pattern: /(.*)
+            provider: sonata_user_bundle
+            context: user
+            form_login:
+                login_path: sonata_user_admin_security_login
+                check_path: sonata_user_admin_security_check
+                default_target_path: sonata_admin_dashboard
+            logout:
+                path: sonata_user_admin_security_logout
+                target: sonata_user_admin_security_login
+            remember_me:
+                secret: secret
+                lifetime: 2629746
+                path: /
+
+    password_hashers:
+        Sonata\UserBundle\Model\UserInterface:
+            algorithm: plaintext
+
+twig:
+    exception_controller: null
+    strict_variables: true
+
+doctrine:
+    dbal:
+        driver: pdo_sqlite
+        path: '%app.base_dir%/sonata_user_test.db3'
+        use_savepoints: true
+    orm:
+        entity_managers:
+            default:
+                mappings:
+                    SonataUserBundle: null
+                    SonataUserTest:
+                        type: attribute
+                        dir: '%kernel.project_dir%/Entity'
+                        is_bundle: false
+                        prefix: Sonata\UserBundle\Tests\App\Entity
+
+sonata_user:
+    class:
+        user: Sonata\UserBundle\Tests\App\Entity\User
+    resetting:
+        email:
+            address: 'sonatauser@example.com'
+            sender_name: 'SonataUserBundle'
